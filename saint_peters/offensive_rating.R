@@ -15,28 +15,29 @@ mm_stats_2 <- mm_stats |>
   group_by(school,image) |> 
   summarise(mm_rating = mean(ortg))
 
-teams <- c("Saint Peter's", "Kentucky", "North Carolina", "Kansas", "Miami (FL)", "Houston", "Villanova", "Arkansas", "Duke")
+teams <- c("Saint Peter's", "North Carolina", "Kansas", "Miami (FL)", "Houston", "Villanova", "Arkansas", "Duke")
 
 team_data |> 
-  # mutate(sp = if_else(school == "Saint Peter's", "Saint Peter's", "Other")) |> 
   filter(school %in% teams) |>
   pivot_longer(4:9,"stat",values_to = "rating") |> 
   select(school,stat,rating) |> 
   filter(stat %in% c('ortg')) |> 
   left_join(mm_stats_2, by = c('school')) |> 
-  group_by(stat) |> 
-  # mutate(std_rating = (rating - mean(rating)) / sd(rating),
-  #        mm_std_rating = (mm_rating - mean(rating)) / sd(rating)) |> 
-  mutate(ctr_rating = (rating - mean(rating)),
-         mm_ctr_rating = (mm_rating - mean(rating))) |>
-  select(school,stat,ctr_rating,mm_ctr_rating, rating, mm_rating,image) |>
-  # pivot_longer(c('ctr_rating','mm_ctr_rating'),names_to = "period",values_to = "rating") |> 
-  # pivot_longer(c('rating','mm_rating'),names_to = "period",values_to = "rating") |>
   ggplot(aes(x = rating, y = mm_rating)) +
-  geom_point(size = 2) +
-  geom_image(aes(image = image)) +
-  geom_abline(slope = 1,intercept = 0, alpha = 0.8, linetype = 'dashed')
-  # xlim(c(90,120)) +
-  # ylim(c(90,120))
-  # facet_wrap(vars(period)) +
-  # scale_alpha_manual(values = c(0.8, .25))
+  geom_abline(slope = 1,intercept = 0, alpha = .9, linetype = 'dashed', size = 1.05) +
+  geom_image(aes(image = image), size = 0.065) +
+  annotate("segment", x = 121, xend = 120, y = 110, yend = 120,
+           arrow = arrow(), size = 1, colour = "grey20") +
+  annotate("label", x = 120, y = 110, vjust = 1, size = 3, hjust = 0.5,
+           label = "Teams above this line are overperforming\ncompared to their season average while\nteams below are underpeforming") +
+  xlim(c(90,125)) +
+  ylim(c(90,125)) +
+  labs(
+    title = "How Well have the Elite Eight Performed in March Madness?",
+    subtitle = "Elite Eight March Madness Offensive Ratings vs. Season Average",
+    x = "Season Offensive Rating",
+    y = "March Madness Offensive Rating"
+  )
+
+ggsave("elite_eight_offensive_ratings.png")    
+  

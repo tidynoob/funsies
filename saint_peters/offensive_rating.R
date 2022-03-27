@@ -33,11 +33,15 @@ team_data |>
   xlim(c(90,125)) +
   ylim(c(90,125)) +
   labs(
-    title = "How Well have the Elite Eight Performed in March Madness?",
+    title = "Have the Elite Eight Performed Better in March Madness?",
     subtitle = "Elite Eight March Madness Offensive Ratings vs. Season Average",
     x = "Season Offensive Rating",
-    y = "March Madness Offensive Rating"
+    y = "March Madness Offensive Rating",
+    caption = "Data: basketball-reference.com | Chart: Mitch Griffin"
+  ) +
+  theme(
+    plot.caption = element_text(size = 6, face = 'italic', color = 'grey30'),
   )
 
-ggsave("elite_eight_offensive_ratings.png")    
+ggsave("elite_eight_offensive_ratings.png")
   

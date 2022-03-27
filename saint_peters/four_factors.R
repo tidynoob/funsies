@@ -36,15 +36,38 @@ team_data |>
   filter(school %in% teams) |>
   pivot_longer(4:9,"stat",values_to = "rating") |> 
   select(school,stat,rating) |> 
-  filter(stat %!in% c('ortg','pace')) |> 
+  filter(stat %in% c('ortg')) |> 
   left_join(mm_stats_2, by = c('school','stat')) |> 
   group_by(stat) |> 
-  mutate(std_rating = (rating - mean(rating)) / sd(rating),
-         mm_std_rating = (mm_rating - mean(rating)) / sd(rating)) |> 
-  select(school,stat,std_rating,mm_std_rating) |> 
-  pivot_longer(c('std_rating','mm_std_rating'),names_to = "period",values_to = "rating") |> 
+  # mutate(std_rating = (rating - mean(rating)) / sd(rating),
+  #        mm_std_rating = (mm_rating - mean(rating)) / sd(rating)) |> 
+  # select(school,stat,std_rating,mm_std_rating) |> 
+  # pivot_longer(c('std_rating','mm_std_rating'),names_to = "period",values_to = "rating") |> 
+  pivot_longer(c('rating','mm_rating'),names_to = "period",values_to = "rating") |>
+  ggplot(aes(x = forcats::fct_rev(period), y = rating, fill = school)) +
+  geom_col(color = 'black', position ='dodge', width = 0.6) +
+  facet_wrap(vars(school))
+  # scale_alpha_manual(values = c(0.8, .25))
+
+team_data |> 
+  # mutate(sp = if_else(school == "Saint Peter's", "Saint Peter's", "Other")) |> 
+  filter(school %in% teams) |>
+  pivot_longer(4:9,"stat",values_to = "rating") |> 
+  select(school,stat,rating) |> 
+  filter(stat %in% c('ortg')) |> 
+  left_join(mm_stats_2, by = c('school','stat')) |> 
+  group_by(stat) |> 
+  # mutate(std_rating = (rating - mean(rating)) / sd(rating),
+  #        mm_std_rating = (mm_rating - mean(rating)) / sd(rating)) |> 
+  mutate(ctr_rating = (rating - mean(rating)),
+         mm_ctr_rating = (mm_rating - mean(rating))) |>
+  select(school,stat,ctr_rating,mm_ctr_rating) |>
+  pivot_longer(c('ctr_rating','mm_ctr_rating'),names_to = "period",values_to = "rating") |> 
+  # pivot_longer(c('rating','mm_rating'),names_to = "period",values_to = "rating") |>
   ggplot(aes(x = school, y = rating, fill = school, alpha = period)) +
   geom_col(color = 'black', position ='dodge', width = 0.6) +
-  facet_wrap(vars(stat)) +
+  facet_wrap(vars(period)) +
   scale_alpha_manual(values = c(0.8, .25))
+
+
   
